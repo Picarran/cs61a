@@ -1,0 +1,1 @@
+1. dice.py µÄmake_test_dice Ô­Àí£¿   ¡Ì
