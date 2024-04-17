@@ -20,6 +20,7 @@ def hand_score(hand):
 
 def shuffle_cards():
     deck = (['J', 'Q', 'K', 'A'] + list(range(2, 11))) * 4
+    """随机打乱列表顺序(洗牌)"""
     random.shuffle(deck)
     return iter(deck)
 
@@ -59,6 +60,7 @@ def blackjack(strategy, announce=print):
         announce('Dealer busts with', dealer_cards)
         return 1
     else:
+        """谁多谁赢"""
         announce('Player has', hand_score(player_cards), 
                  'and dealer has', hand_score(dealer_cards))
         diff = hand_score(player_cards) - hand_score(dealer_cards)

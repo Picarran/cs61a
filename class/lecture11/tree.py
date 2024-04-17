@@ -367,3 +367,64 @@ def balanced(t):
     Return True if bool(x) is True for all values x in the iterable.
     If the iterable is empty, return True."""
     return all([sum_tree(branches(t)[0])==sum_tree(b) and balanced(b) for b in branches(t)])
+
+def add_trees(t1, t2):
+    """
+    Define the function add_trees, which takes in two trees and returns a new tree 
+    where each corresponding node from the first tree is added with 
+    the node from the second tree. 
+    If a node at any particular position is present in one tree but not the other, 
+    it should be present in the new tree as well. 
+    At each level of the tree, nodes correspond to each other starting 
+    from the leftmost node.
+
+    >>> numbers = tree(1,
+    ...                [tree(2,
+    ...                      [tree(3),
+    ...                       tree(4)]),
+    ...                 tree(5,
+    ...                      [tree(6,
+    ...                            [tree(7)]),
+    ...                       tree(8)])])
+    >>> print_tree(add_trees(numbers, numbers))
+    2
+      4
+        6
+        8
+      10
+        12
+          14
+        16
+    >>> print_tree(add_trees(tree(2), tree(3, [tree(4), tree(5)])))
+    5
+      4
+      5
+    >>> print_tree(add_trees(tree(2, [tree(3)]), tree(2, [tree(3), tree(4)])))
+    4
+      6
+      4
+    >>> print_tree(add_trees(tree(2, [tree(3, [tree(4), tree(5)])]), \
+    tree(2, [tree(3, [tree(4)]), tree(5)])))
+    4
+      6
+        8
+        5
+      5
+    """
+
+    "*** YOUR CODE HERE ***"
+    if is_leaf(t1):
+        return tree(label(t1)+label(t2), branches(t2))
+    if is_leaf(t2):
+        return tree(label(t1)+label(t2), branches(t1))
+    bs = []
+    len_bs = max(len(branches(t1)), len(branches(t2)))
+    for i in range(len_bs):
+        if i >=len(branches(t1)):
+            b = branches(t2)[i]
+        elif i >= len(branches(t2)):
+            b = branches(t1)[i]
+        else:
+            b = add_trees(branches(t1)[i], branches(t2)[i])
+        bs.append(b)
+    return tree(label(t1)+label(t2), bs)

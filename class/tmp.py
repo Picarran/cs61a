@@ -1,117 +1,121 @@
+# Tree ADT
+
+def tree(label, branches=[]):
+    """Construct a tree with the given label value and a list of branches."""
+    for branch in branches:
+        assert is_tree(branch), 'branches must be trees'
+    return [label] + list(branches)
 
 
-def memo_diff(diff_function):
-    """A memoization function."""
-    cache = {}
+def label(tree):
+    """Return the label value of a tree."""
+    return tree[0]
 
-    def memoized(typed, source, limit):
-        # BEGIN PROBLEM EC
-        "*** YOUR CODE HERE ***"
-        if (typed, source) in cache and limit <= cache[(typed, source)][1]:
-            return cache[(typed, source)][0]
-        else:
-            res = diff_function(typed, source, limit)
-            cache[(typed, source)]=(res, limit)
-            return res
-        # END PROBLEM EC
-    return memoized
 
-@memo_diff
-def minimum_mewtations(typed, source, limit):
-    """A diff function that computes the edit distance from TYPED to SOURCE.
-    This function takes in a string TYPED, a string SOURCE, and a number LIMIT.
-    Arguments:
-        typed: a starting word
-        source: a string representing a desired goal word
-        limit: a number representing an upper bound on the number of edits
-    >>> big_limit = 10
-    >>> minimum_mewtations("cats", "scat", big_limit)       # cats -> scats -> scat
+def branches(tree):
+    """Return the list of branches of the given tree."""
+    return tree[1:]
+
+
+def is_tree(tree):
+    """Returns True if the given tree is a tree, and False otherwise."""
+    if type(tree) != list or len(tree) < 1:
+        return False
+    for branch in branches(tree):
+        if not is_tree(branch):
+            return False
+    return True
+
+
+def is_leaf(tree):
+    """Returns True if the given tree's list of branches is empty, and False
+    otherwise.
+    """
+    return not branches(tree)
+
+
+def print_tree(t, indent=0):
+    """Print a representation of this tree in which each node is
+    indented by two spaces times its depth from the root.
+
+    >>> print_tree(tree(1))
+    1
+    >>> print_tree(tree(1, [tree(2)]))
+    1
+      2
+    >>> numbers = tree(1, [tree(2), tree(3, [tree(4), tree(5)]), tree(6, [tree(7)])])
+    >>> print_tree(numbers)
+    1
+      2
+      3
+        4
+        5
+      6
+        7
+    """
+    print('  ' * indent + str(label(t)))
+    for b in branches(t):
+        print_tree(b, indent + 1)
+
+
+
+
+def add_trees(t1, t2):
+    """
+    >>> numbers = tree(1,
+    ...                [tree(2,
+    ...                      [tree(3),
+    ...                       tree(4)]),
+    ...                 tree(5,
+    ...                      [tree(6,
+    ...                            [tree(7)]),
+    ...                       tree(8)])])
+    >>> print_tree(add_trees(numbers, numbers))
     2
-    >>> minimum_mewtations("purng", "purring", big_limit)   # purng -> purrng -> purring
-    2
-    >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
-    3
+      4
+        6
+        8
+      10
+        12
+          14
+        16
+    >>> print_tree(add_trees(tree(2), tree(3, [tree(4), tree(5)])))
+    5
+      4
+      5
+    >>> print_tree(add_trees(tree(2, [tree(3)]), tree(2, [tree(3), tree(4)])))
+    4
+      6
+      4
+    >>> print_tree(add_trees(tree(2, [tree(3, [tree(4), tree(5)])]), \
+    tree(2, [tree(3, [tree(4)]), tree(5)])))
+    4
+      6
+        8
+        5
+      5
     """
 
-    if limit<0 or (len(typed)==0 and len(source)==0):  # Base cases should go here, you may add more base cases as needed.
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        return 0 
-        # END
-    if len(typed)==0 or len(source)==0:
-        return abs(len(typed)- len(source))
-    
-    if typed[0]==source[0]:
-        cnt = 0 
-        return cnt + minimum_mewtations(typed[1:], source[1:], limit)
-    else:
-        cnt=1
-        # if len(typed)==1:
-        #     if typed[0] in source:
-        #         return cnt + abs(len(typed)- len(source)) - 1
-        #     return cnt + abs(len(typed)- len(source))
-        # if len(source) ==1:
-        #     if source[0] in typed:
-        #         return cnt + abs(len(typed)- len(source)) - 1
-        #     return cnt + abs(len(typed)- len(source)) 
-        # # sub
-        # if typed[1] == source[1]:
-        sub =  cnt + minimum_mewtations(typed[1:], source[1:], limit-1)
-        # 多了 or 少了
-        
-        add = cnt + minimum_mewtations(typed[1:], source, limit-1)
-        cut = cnt + minimum_mewtations(typed, source[1:], limit-1)
-        return min(sub, add, cut)
+    "*** YOUR CODE HERE ***"
+    if is_leaf(t1):
+        return tree(label(t1)+label(t2), branches(t2))
+    if is_leaf(t2):
+        return tree(label(t1)+label(t2), branches(t1))
+    # return tree(label(t1)+label(t2), [add_trees()])
+    bs = []
+    len_bs = max(len(branches(t1)), len(branches(t2)))
+    for i in range(len_bs):
+        if i >=len(branches(t1)):
+            b = branches(t2)[i]
+        elif i >= len(branches(t2)):
+            b = branches(t1)[i]
+        else:
+            b = add_trees(branches(t1)[i], branches(t2)[i])
+        bs.append(b)
+    return tree(label(t1)+label(t2), bs)
 
-# print(minimum_mewtations('rut', 'rzumt',2))
-# print(minimum_mewtations('donee', 'shush', 100))
-# print(sum([True , True,True ,False]))
+print_tree(add_trees(tree(2), tree(3, [tree(4), tree(5)])))
 
-
-
-
-"""
-
->>> from cats import minimum_mewtations, feline_fixes, autocorrect, lines_from_file
->>> all_words = lines_from_file("data/words.txt")
->>> common_words = lines_from_file("data/common_words.txt")
->>> minimum_mewtations.call_count = 0
->>> autocorrect("woll", common_words, minimum_mewtations, 4)
-'well'
->>> minimum_mewtations.call_count <= 72000 # minimum_mewtations should be memoized
-True
->>> minimum_mewtations.call_count = 0
->>> autocorrect("woll", common_words, feline_fixes, 4)
-'well'
->>> minimum_mewtations.call_count
-0
->>> minimum_mewtations.call_count = 0
->>> autocorrect("woll", common_words, minimum_mewtations, 4)  # identical to the first call
-'well'
->>> minimum_mewtations.call_count
-0
->>> minimum_mewtations.call_count = 0
->>> autocorrect("woll", common_words, minimum_mewtations, 4)
-'well'
->>> minimum_mewtations.call_count
-0
->>> minimum_mewtations.call_count = 0
->>> autocorrect("woll", common_words, minimum_mewtations, 3)
-'well'
->>> minimum_mewtations.call_count < 2500
-True
->>> minimum_mewtations.call_count = 0
->>> autocorrect("woll", all_words, minimum_mewtations, 2)
-'will'
->>> minimum_mewtations.call_count < 2700000
-False
-
-"""
-
-
-# lst = [1]
-# print(lst[1:])
-
-dic = {}
-dic[1] = {1,2}
-print(dic)
+x=[1,2,3]
+y=[4,5,6]
+print()
