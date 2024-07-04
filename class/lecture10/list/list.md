@@ -7,3 +7,5 @@
 4. list(): 拷贝新的,value
 5. slice assignment: value
 ![alt text](image-1.png)
+
+![alt text](image-3.png)
